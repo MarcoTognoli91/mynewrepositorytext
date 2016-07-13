@@ -6,6 +6,7 @@
 
 from openpyxl import *
 
+
 def fenestration_function(T_set_heating, T_set_cooling, T_out_heating, T_out_cooling, DR, Latitude, Excelname):
     """This function calculates the Heating Factor and Cooling Factor of fenestrations (trasparent walls). 
     The input argument are  first of all to fill out the Excel table ("WindowList2.xlsx") and to add the 
@@ -17,7 +18,7 @@ def fenestration_function(T_set_heating, T_set_cooling, T_out_heating, T_out_coo
     """
     import os
     
-    #os.chdir("C:/Users/Marco/Dropbox\Building system - Group B work/May 26")<----pay attention here as the function must rely on the same excel folder
+    #os.chdir("C:/Users/Marco/Dropbox\Building system - Group B work/May 26")#<----pay attention here as the function must rely on the same excel folder
     ExcelFile = load_workbook(Excelname)#Once our workbook it is defined it will be called several times
     WindowData = ExcelFile.get_sheet_by_name("WindowData")#with this command we extract the Excel sheet of interest
     name_cells = WindowData.columns[0][1:]#The windows data are arranged on the same sheet split in columns
@@ -259,7 +260,7 @@ def fenestration_function(T_set_heating, T_set_cooling, T_out_heating, T_out_coo
         window_index= windows.index(window)
         F_shd = window["F_shd"]
         Results.columns[5][window_index+1].value = F_shd
-        ExcelFile.save(Excelname)
+        #ExcelFile.save(Excelname)
     
     #PXI calculation
     
@@ -287,8 +288,8 @@ def fenestration_function(T_set_heating, T_set_cooling, T_out_heating, T_out_coo
         if window_Overhang_length>0:#for windows with external overhang
             PXI_index = PXI_orientation.index(window_orientation)#once again we need to interpolate the values on latitude scale
             #window_latitude =  PXI_latitude_IDs.index(Latitude)
-            window_direction_PXI_tuple=PXI.rows[PXI_index*3+1][2:]#the problem here is the difference in direct, diffuse and total irradiance
-            window_direction_PXI_direct_tuple=PXI.rows[PXI_index*3][2:]#so we have to compute the list of values for each of them at each window exposition
+            window_direction_PXI_tuple=PXI.rows[PXI_index*3+5][2:]#the problem here is the difference in direct, diffuse and total irradiance
+            window_direction_PXI_direct_tuple=PXI.rows[PXI_index*3+4][2:]#so we have to compute the list of values for each of them at each window exposition
             window_direction_PXI=list()        
             for index in window_direction_PXI_tuple:
                 index_value = index.value
@@ -301,7 +302,7 @@ def fenestration_function(T_set_heating, T_set_cooling, T_out_heating, T_out_coo
             PXI_function_direct=interp1d(SLFs_coordinate_IDs, window_direction_PXI_direct,kind='cubic')
             PXI_results=float(window_T_x*float(PXI_function_diffuse(Latitude))+(1-window_F_shd)*float((PXI_function_direct(Latitude))))
         elif window_Overhang_length==0:#for windows with no overhang
-            window_direction_PXI_total_tuple=PXI.rows[PXI_index*3+2][2:]
+            window_direction_PXI_total_tuple=PXI.rows[PXI_index*3+6][2:]
             window_direction_PXI_total=list()        
             for index in window_direction_PXI_total_tuple:
                 index_value = index.value
@@ -314,7 +315,7 @@ def fenestration_function(T_set_heating, T_set_cooling, T_out_heating, T_out_coo
         window_index= windows.index(window)
         PXI_result = window["PXI"]
         Results.columns[6][window_index+1].value = PXI_result
-        ExcelFile.save(Excelname)
+        #ExcelFile.save(Excelname)
     
     #SLF or also called FFs, they account for solar irradiance that affects the peak cooling load
     SLF  = ExcelFile.get_sheet_by_name("Solar_Load_Factor")
@@ -354,7 +355,7 @@ def fenestration_function(T_set_heating, T_set_cooling, T_out_heating, T_out_coo
         window_index= windows.index(window)
         SLF = window["SLF"]
         Results.columns[9][window_index+1].value = SLF #in the table SLF are indicated also as FFS
-        ExcelFile.save(Excelname)
+        #ExcelFile.save(Excelname)
     
     #IAC
     IACs=ExcelFile.get_sheet_by_name("Interior_Attenuation_Coefficien")
@@ -433,7 +434,7 @@ def fenestration_function(T_set_heating, T_set_cooling, T_out_heating, T_out_coo
         window_index= windows.index(window)
         IAC_result = window["IAC"]
         Results.columns[8][window_index+1].value = IAC_result
-        ExcelFile.save(Excelname)
+        #ExcelFile.save(Excelname)
     
     #CF final calculation of cooling condition
     U_dict=Results.columns[2][1:]
